@@ -1,6 +1,7 @@
 #ifndef _BIGINT_H__
 #define _BIGINT_H__ 1
 
+#include <cassert>
 #include <cstdint>
 #include <cstring>
 #include <sstream>
@@ -31,28 +32,31 @@ public:
     return ss.str();
   }
 
-  void random_init() {
+  void random_init_all() {
     std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
     for (int i = 0; i < N; ++i) {
       _data[i] = generator();
     }
   }
 
-  bool operator==(const bigint& b) const {
-    return comapre(b) == 0;
+  void random_init_half() {
+    std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
+    for (int i = 0; i < N / 2; ++i) {
+      _data[i] = generator();
+    }
   }
-  bool operator<(const bigint& b) const {
-    return comapre(b) < 0;
-  }
-  bool operator>(const bigint& b) const {
-    return comapre(b) > 0;
-  }
-  bool operator<=(const bigint& b) const {
-    return comapre(b) <= 0;
-  }
-  bool operator>=(const bigint& b) const {
-    return comapre(b) >= 0;
-  }
+
+  bool operator<(uint32_t n) const { return comapre(n) < 0; }
+  bool operator>(uint32_t n) const { return comapre(n) > 0; }
+  bool operator==(uint32_t n) const { return comapre(n) == 0; }
+  bool operator<=(uint32_t n) const { return comapre(n) <= 0; }
+  bool operator>=(uint32_t n) const { return comapre(n) >= 0; }
+
+  bool operator<(const bigint& b) const { return comapre(b) < 0; }
+  bool operator>(const bigint& b) const { return comapre(b) > 0; }
+  bool operator==(const bigint& b) const { return comapre(b) == 0; }
+  bool operator<=(const bigint& b) const { return comapre(b) <= 0; }
+  bool operator>=(const bigint& b) const { return comapre(b) >= 0; }
 
   bigint& operator+=(uint32_t n) {
     union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
@@ -78,6 +82,7 @@ public:
   }
 
   bigint& operator-=(uint32_t n) {
+  assert(*this > n);
   union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
     _u.u32 = {0, -n};
     for (int i = 0; i < N; ++i) {
@@ -88,6 +93,7 @@ public:
   }
 
   bigint& operator-=(const bigint& b) {
+    assert(*this > b);
     union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
     _u.u64 = 0;
     for (int i = 0; i < N; ++i) {
@@ -98,22 +104,22 @@ public:
   }
 
   bigint operator+(uint32_t n) const {
-    bigint x(*this);
+    bigint x{*this};
     x += n;
     return x;
   }
   bigint operator+(const bigint& b) const {
-    bigint x(*this);
+    bigint x{*this};
     x += b;
     return x;
   }
   bigint operator-(uint32_t n) const {
-    bigint x(*this);
+    bigint x{*this};
     x -= n;
     return x;
   }
   bigint operator-(const bigint& b) const {
-    bigint x(*this);
+    bigint x{*this};
     x -= b;
     return x;
   }

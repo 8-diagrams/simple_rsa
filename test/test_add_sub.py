@@ -3,22 +3,27 @@
 import sys
 
 count = 0
-right_add = 0
-right_sub = 0
+add_wrong = 0
+sub_wrong = 0
 
-for line in sys.stdin.readlines():
+lines = sys.stdin.readlines()
+data = [(x.strip() for x in line.split()) for line in lines]
+for dd in data:
+    sa, op, sb, eq, sc = dd
+    a = int(sa, 16)
+    b = int(sb, 16)
+    c = int(sc, 16)
+    l = len(sa) - 2
     count += 1
-    nums = [int(x, 16) for x in line.strip().split(",")]
-    a, b, c, d = nums
-    cc = (a + b) % (2**1024)
-    if c == cc:
-        right_add += 1
-    else:
-        print("\n{} +\n{} = \n{}, \n{}\n".format(hex(a), hex(b), hex(c), hex(cc)))
-    dd = a - b if a >= b else b -a
-    if d == dd:
-        right_sub += 1
-    else:
-        print("\n{} -\n{} = \n{}, \n{}\n".format(hex(a), hex(b), hex(d), hex(dd)))
+    if op == "+":
+        cc = a + b
+        if c != cc:
+            add_wrong += 1
+            print("\n{}\n+\n{}\nwrong={}\nright={:#0{}x}\n".format(sa,sb,sc,cc,l))
+    elif op == "-":
+        cc = a - b
+        if c != cc:
+            sub_wrong += 1
+            print("\n{}\n-\n{}\nwrong={}\nright={:#0{}x}\n".format(sa,sb,sc,cc,l))
 
-print("\nall:{},add right:{},{:f}, sub right:{},{:f}".format(count, right_add, right_add/count, right_sub, right_sub/count))
+print("\nall:{},add_wrong:{},{:f}, sub_wrong:{},{:f}".format(count, add_wrong, add_wrong/count, sub_wrong, sub_wrong/count))
