@@ -1,16 +1,22 @@
 #include <iostream>
-#include "bigint.h"
+#include <chrono>
+#include <random>
+#include "biguint.h"
 
 using namespace std;
 using namespace simple_rsa;
 
-typedef bigint<32> uint1024;
-
 int main() {
-  uint1024 a, b;
+  BigUint a;
+  a.random_bits(1);
+  BigUint b(a);
+  auto c = a - b;
+  cout<<a.to_string()<<" - "<<b.to_string()<<" = "<<c.to_string()<<endl;
+
+  std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
   for (int i = 0 ; i < 10000; ++i) {
-    a.random_init_all();
-    b.random_init_all();
+    a.random_bits((generator() % 2048) + 1);
+    b.random_bits((generator() % 2048) + 1);
     auto c = a + b;
     if (c < a || c < b) {
       continue;

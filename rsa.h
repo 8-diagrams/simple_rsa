@@ -1,7 +1,7 @@
 #ifndef _RSA_H__
 #define _RSA_H__ 1
 
-#include <bigint.h>
+#include <biguint.h>
 
 namespace simple_rsa {
 

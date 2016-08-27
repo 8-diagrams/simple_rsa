@@ -5,7 +5,6 @@
 #include <string>
 #include <vector>
 
-
 namespace simple_rsa {
 
 using std::uint32_t;
@@ -19,13 +18,13 @@ public:
   BigUint(BigUint&& rhs):_data{std::move(rhs._data)} {}
   ~BigUint() = default;
 
-  bigint& operator=(const BigUint& other) {
+  BigUint& operator=(const BigUint& other) {
     if (this != &other) {
       _data = other._data;
     }
     return *this;
   }
-  bigint& operator=(BigUint&& rhs) {
+  BigUint& operator=(BigUint&& rhs) {
     if (this != &rhs) {
       _data = std::move(rhs._data);
     }
@@ -34,9 +33,6 @@ public:
 
   // hexadecimal format
   std::string to_string() const;
-
-  // not exactly, multiple of 32
-  uint bits_length() const;
 
   // not exactly, multiple of 32
   void shrink_to_fit();
@@ -60,11 +56,31 @@ public:
   BigUint& operator/=(const BigUint& b);
 
 private:
-  int _compare_(const const BigUint& b) const;
+  int _compare_(const BigUint& b) const;
 
 private:
   std::vector<uint32_t> _data;
 };
+
+inline BigUint operator+(const BigUint& b1, const BigUint& b2) {
+  BigUint c(b1);
+  return c += b2;
+}
+
+inline BigUint operator-(const BigUint& b1, const BigUint& b2) {
+  BigUint c(b1);
+  return c -= b2;
+}
+
+inline BigUint operator*(const BigUint& b1, const BigUint& b2) {
+  BigUint c(b1);
+  return c *= b2;
+}
+
+inline BigUint operator/(const BigUint& b1, const BigUint& b2) {
+  BigUint c(b1);
+  return c /= b2;
+}
 
 } // namespace simple_rsa
 
