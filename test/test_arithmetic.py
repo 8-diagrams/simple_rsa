@@ -29,7 +29,7 @@ class tester():
     print("{} -- all:{}".format(self._op, self._count))
     if self._count > 0:
       print("wrong: {}, {:3f}".format(self._wrong, self._wrong/self._count))
-      print()
+    print()
 
 
 _ops = ["+", "-", "*", "/"]
