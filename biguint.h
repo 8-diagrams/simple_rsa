@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <utility>
 
 namespace simple_rsa {
 
@@ -57,6 +58,8 @@ public:
 
 private:
   int _compare_(const BigUint& b) const;
+  // left shift 32 * n bits
+  void _left_shift32_(uint s);
 
 private:
   std::vector<uint32_t> _data;

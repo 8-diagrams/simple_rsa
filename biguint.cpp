@@ -54,6 +54,21 @@ int BigUint::_compare_(const BigUint& b) const {
   }
 }
 
+void BigUint::_left_shift32_(uint s) {
+  if (*this == 0) {
+    return;
+  }
+  uint old_size = _data.size();
+  _data.resize(old_size + s);
+  for (int i = old_size - 1; i >= 0; --i) {
+    _data[i + s] = _data[i];
+  }
+  for (uint i = 0; i < s; ++i) {
+    _data[i] = 0;
+  }
+
+}
+
 BigUint& BigUint::operator+=(uint32_t n) {
   union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
   _u.u32 = {0, n};
@@ -88,6 +103,15 @@ BigUint& BigUint::operator-=(uint32_t n) {
 }
 
 BigUint& BigUint::operator*=(uint32_t n) {
+  union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
+  _u.u32 = {0, n};
+  for (uint i = 0; i < _data.size(); ++i) {
+    _u.u64 = (uint64_t)_data[i] * (int32_t)_u.u32.h;
+    _data[i] = _u.u32.l;
+  }
+  if (_u.u32.h > 0) {
+    _data.push_back(_u.u32.h);
+  }
   return *this;
 }
 
@@ -117,8 +141,8 @@ BigUint& BigUint::operator-=(const BigUint& b) {
   assert(*this >= b);
   union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
   _u.u64 = 0;
-  for (int i = 0; i < _data.size(); ++i) {
-    uint32_t x = i < b._data.size() ? b._data[i] : 0;
+  for (int i = 0; i < (int)_data.size(); ++i) {
+    uint32_t x = i < (int)b._data.size() ? b._data[i] : 0;
     _u.u64 = (int64_t)_data[i] -(int64_t)x + (int32_t)_u.u32.h;
     _data[i] = _u.u32.l;
   }
@@ -126,6 +150,21 @@ BigUint& BigUint::operator-=(const BigUint& b) {
 }
 
 BigUint& BigUint::operator*=(const BigUint& b) {
+  uint m = _data.size(), n = b._data.size();
+  std::vector<uint32_t> c(m + n);
+  for (uint i = 0; i < n; ++i) {
+    union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
+    _u.u64 = 0;
+    for (uint j = 0; j < m; ++j) {
+      _u.u64 = (uint64_t)_data[i] * b._data[j]  + c[i + j] + _u.u32.h;
+      c[i + j] = _u.u32.l;
+    }
+    c[i + n] = _u.u32.h;
+  }
+  while (c.back() == 0) {
+    c.pop_back();
+  }
+  _data = std::move(c);
   return *this;
 }
 
