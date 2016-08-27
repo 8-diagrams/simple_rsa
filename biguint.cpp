@@ -152,16 +152,16 @@ BigUint& BigUint::operator-=(const BigUint& b) {
 BigUint& BigUint::operator*=(const BigUint& b) {
   uint m = _data.size(), n = b._data.size();
   std::vector<uint32_t> c(m + n);
-  for (uint i = 0; i < n; ++i) {
+  for (uint i = 0; i < m; ++i) {
     union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
     _u.u64 = 0;
-    for (uint j = 0; j < m; ++j) {
+    for (uint j = 0; j < n; ++j) {
       _u.u64 = (uint64_t)_data[i] * b._data[j]  + c[i + j] + _u.u32.h;
       c[i + j] = _u.u32.l;
     }
     c[i + n] = _u.u32.h;
   }
-  while (c.back() == 0) {
+  while (c.back() == 0 && c.size() > 1) {
     c.pop_back();
   }
   _data = std::move(c);
