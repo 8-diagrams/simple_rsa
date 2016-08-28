@@ -72,6 +72,31 @@ void BigUint::_left_shift32_(uint s) {
   }
 }
 
+void BigUint::_div_and_mod_(const BigUint& b, BigUint& q, BigUint& r) const {
+  assert(*this > b);
+  r = *this;
+  uint m = r._data.size(), n = b._data.size();
+  q._data.resize(m - n + 1);
+  r._data.push_back(0);
+  for (int i = m - n; i >= 0; --i) {
+    union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
+    _u.u32.h = r._data[i + n];
+    _u.u32.l = r._data[i + n - 1];
+    uint32_t t = _u.u64 / b._data.back();
+    BigUint bb = b * t;
+    while (_compare_uint32_(bb._data.data(), r._data.data() + i, bb._data.size()) > 0) {
+      --t;
+      bb = b * t;
+    }
+    q._data[i] = t;
+    bb._left_shift32_(i);
+    r -= bb;
+  }
+  if (q._data.back() == 0 && q._data.size() > 1) {
+    q._data.pop_back();
+  }
+}
+
 
 BigUint& BigUint::operator+=(uint32_t n) {
   union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
@@ -196,40 +221,32 @@ BigUint& BigUint::operator*=(const BigUint& b) {
 
 BigUint& BigUint::operator/=(const BigUint& b) {
   assert(b > 0);
-  if (*this < b) {
+  if (*this == b) {
+    // *this = 1
+    _data.resize(1);
+    _data[0] = 1;
+  } else if (*this < b) {
     // *this = 0
     _data.resize(1);
     _data[0] = 0;
   } else {
-    uint m = _data.size(), n = b._data.size();
-    std::vector<uint32_t> c(m - n + 1);
-    _data.push_back(0);
-    for (int i = m - n; i >= 0; --i) {
-      union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
-      _u.u32.h = _data[i + n];
-      _u.u32.l = _data[i + n - 1];
-      uint32_t q = _u.u64 / b._data.back();
-      BigUint bb = b * q;
-      while (_compare_uint32_(bb._data.data(), _data.data() + i, bb._data.size()) > 0) {
-        --q;
-        bb = b * q;
-      }
-      c[i] = q;
-      bb._left_shift32_(i);
-      *this -= bb;
-    }
-    if (c.back() == 0 && c.size() > 1) {
-      c.pop_back();
-    }
-    _data = std::move(c);
+    BigUint q, r;
+    _div_and_mod_(b, q, r);
+    *this = std::move(q);
   }
   return *this;
 }
 
 BigUint& BigUint::operator%=(const BigUint& b) {
-  auto q = *this / b;
-  auto r = *this - b * q;
-  *this = std::move(r);
+  if (*this == b) {
+    // *this = 0
+    _data.resize(1);
+    _data[0] = 0;
+  } else if (*this > b) {
+    BigUint q, r;
+    _div_and_mod_(b, q, r);
+    *this = std::move(r);
+  }
   return *this;
 }
 

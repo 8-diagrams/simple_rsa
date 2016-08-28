@@ -64,6 +64,8 @@ private:
   int _compare_(const BigUint& b) const;
   // left shift 32 * n bits
   void _left_shift32_(uint s);
+  // calculate *this = b * q + r
+  void _div_and_mod_(const BigUint& b, BigUint& q, BigUint& r) const;
 
 private:
   std::vector<uint32_t> _data;

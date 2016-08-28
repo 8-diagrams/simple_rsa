@@ -36,4 +36,7 @@ int main() {
     test(a, n);
     test(a, b);
   }
+  a.random_bits((generator() % 1024) + 1);
+  b = a;
+  test(a, b);
 }
