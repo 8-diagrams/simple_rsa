@@ -57,6 +57,7 @@ public:
   BigUint& operator/=(const BigUint& b);
 
 private:
+  int _compare_uint32_(const uint32_t *a, const uint32_t *b, int n) const;
   int _compare_(const BigUint& b) const;
   // left shift 32 * n bits
   void _left_shift32_(uint s);
