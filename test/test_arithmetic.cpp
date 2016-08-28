@@ -22,6 +22,8 @@ void test(const BigUint& a, const BigUint& b) {
   cout<<sa<<" * "<<sb<<" = "<<c.to_string()<<endl;
   c = a / b;
   cout<<sa<<" / "<<sb<<" = "<<c.to_string()<<endl;
+  c = a % b;
+  cout<<sa<<" % "<<sb<<" = "<<c.to_string()<<endl;
 }
 
 int main() {

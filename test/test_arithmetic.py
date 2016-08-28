@@ -15,6 +15,8 @@ class tester():
       self._op_ = lambda x, y : x*y
     elif op == "/":
       self._op_ = lambda x, y : x//y
+    elif op == "%":
+      self._op_ = lambda x, y : x%y
     else:
       self._op_ = lambda x, y : 0
 
@@ -33,7 +35,7 @@ class tester():
     print()
 
 
-_ops = ["+", "-", "*", "/"]
+_ops = ["+", "-", "*", "/", "%"]
 _testers = {op : tester(op) for op in _ops}
 
 for line in sys.stdin.readlines():

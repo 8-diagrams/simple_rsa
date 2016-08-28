@@ -134,6 +134,17 @@ BigUint& BigUint::operator/=(uint32_t n) {
   return *this;
 }
 
+BigUint& BigUint::operator%=(uint32_t n) {
+  uint32_t k = UINT32_MAX % n + 1;
+  uint32_t r = 0;
+  for (int i = (int)_data.size(); i >= 0; ++i) {
+    r = ((uint64_t)r * k + _data[i]) % n;
+  }
+  _data.resize(1);
+  _data.front() = r;
+  return *this;
+}
+
 BigUint& BigUint::operator+=(const BigUint& b) {
   union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
   _u.u64 = 0;
@@ -215,5 +226,11 @@ BigUint& BigUint::operator/=(const BigUint& b) {
   return *this;
 }
 
+BigUint& BigUint::operator%=(const BigUint& b) {
+  auto q = *this / b;
+  auto r = *this - b * q;
+  *this = std::move(r);
+  return *this;
+}
 
 } // namespace simple_rsa

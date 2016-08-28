@@ -9,6 +9,7 @@
 namespace simple_rsa {
 
 using std::uint32_t;
+using std::uint64_t;
 typedef unsigned int uint;
 
 class BigUint {
@@ -51,10 +52,12 @@ public:
   BigUint& operator-=(uint32_t n);
   BigUint& operator*=(uint32_t n);
   BigUint& operator/=(uint32_t n);
+  BigUint& operator%=(uint32_t n);
   BigUint& operator+=(const BigUint& b);
   BigUint& operator-=(const BigUint& b);
   BigUint& operator*=(const BigUint& b);
   BigUint& operator/=(const BigUint& b);
+  BigUint& operator%=(const BigUint& b);
 
 private:
   int _compare_uint32_(const uint32_t *a, const uint32_t *b, int n) const;
@@ -84,6 +87,11 @@ inline BigUint operator*(const BigUint& b1, const BigUint& b2) {
 inline BigUint operator/(const BigUint& b1, const BigUint& b2) {
   BigUint c(b1);
   return c /= b2;
+}
+
+inline BigUint operator%(const BigUint& b1, const BigUint& b2) {
+  BigUint c(b1);
+  return c %= b2;
 }
 
 } // namespace simple_rsa
