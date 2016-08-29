@@ -35,6 +35,11 @@ void BigUint::random_bits(uint bits) {
   }
 }
 
+void BigUint::_set_uint32_(uint32_t n) {
+  _data.resize(1);
+  _data[0] = n;
+}
+
 int BigUint::_compare_uint32_(const uint32_t *a, const uint32_t *b, int n) const {
   for (int i = n - 1; i >= 0 ; --i) {
     if (a[i] > b[i]) {
@@ -223,12 +228,10 @@ BigUint& BigUint::operator/=(const BigUint& b) {
   assert(b > 0);
   if (*this == b) {
     // *this = 1
-    _data.resize(1);
-    _data[0] = 1;
+    _set_uint32_(1);
   } else if (*this < b) {
     // *this = 0
-    _data.resize(1);
-    _data[0] = 0;
+    _set_uint32_(0);
   } else {
     BigUint q, r;
     _div_and_mod_(b, q, r);
@@ -240,8 +243,7 @@ BigUint& BigUint::operator/=(const BigUint& b) {
 BigUint& BigUint::operator%=(const BigUint& b) {
   if (*this == b) {
     // *this = 0
-    _data.resize(1);
-    _data[0] = 0;
+    _set_uint32_(0);
   } else if (*this > b) {
     BigUint q, r;
     _div_and_mod_(b, q, r);

@@ -60,11 +60,12 @@ public:
   BigUint& operator%=(const BigUint& b);
 
 private:
+  void _set_uint32_(uint32_t n);
   int _compare_uint32_(const uint32_t *a, const uint32_t *b, int n) const;
   int _compare_(const BigUint& b) const;
   // left shift 32 * n bits
   void _left_shift32_(uint s);
-  // calculate *this = b * q + r
+  // calculate q = *this / b; r = *this % b;
   void _div_and_mod_(const BigUint& b, BigUint& q, BigUint& r) const;
 
 private:
