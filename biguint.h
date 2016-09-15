@@ -42,15 +42,20 @@ public:
   // not exactly, multiple of 32
   void random_bits(uint bits);
 
+  bool is_odd() const { return (_data[0] & 0x1) != 0; }
+  bool is_even() const { return (_data[0] & 0x1) == 0; }
+
   bool operator<(uint32_t n) const { return _data.size() == 1 && _data[0] < n; }
   bool operator>(uint32_t n) const { return _data.size() > 1 || _data[0] > n; }
   bool operator==(uint32_t n) const { return _data.size() == 1 && _data[0] == n; }
+  bool operator!=(uint32_t n) const { return _data.size() == 1 || _data[0] != n; }
   bool operator<=(uint32_t n) const { return _data.size() == 1 && _data[0] <= n; }
   bool operator>=(uint32_t n) const { return _data.size() > 1 || _data[0] >= n; }
 
   bool operator<(const BigUint& b) const { return _compare_(b) < 0; }
   bool operator>(const BigUint& b) const { return _compare_(b) > 0; }
   bool operator==(const BigUint& b) const { return _compare_(b) == 0; }
+  bool operator!=(const BigUint& b) const { return _compare_(b) != 0; }
   bool operator<=(const BigUint& b) const { return _compare_(b) <= 0; }
   bool operator>=(const BigUint& b) const { return _compare_(b) >= 0; }
 
@@ -67,6 +72,8 @@ public:
 
   // modular multiplicative inverse, n^(-1) mod(*this)
   BigUint mod_mul_inv(uint32_t n) const;
+  // modular exponentiation, b^e mod(*this)
+  BigUint mod_pow(const BigUint& b, const BigUint& e) const;
 
 private:
   void _set_uint32_(uint32_t n);
@@ -74,10 +81,15 @@ private:
   int _compare_(const BigUint& b) const;
   // left shift 32 * n bits
   void _left_shift32_(uint s);
+  // right shift 32 * n bits
+  void _right_shift32_(uint s);
   // calculate q = *this / n; r = *this % n;
   void _div_and_mod_(uint32_t n, BigUint& q, uint32_t& r) const;
-  // calculate q = *this / b; r = *this % b;
-  void _div_and_mod_(const BigUint& b, BigUint& q, BigUint& r) const;
+
+  // montgomery multiplication, a*b*(R^-1) mod(*this)
+  // r = 2^32, R = r^(*this.size()), m == r - (*this[0])^-1,
+  // calculate m outside to avoid calculating every time in loop
+  BigUint _montgomery_(const BigUint& a, const BigUint& b, uint32_t m) const;
 
 private:
   std::vector<uint32_t> _data;

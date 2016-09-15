@@ -9,11 +9,16 @@ class tester():
     self._op = op
     if op == "mod_mul_inv":
       self._test_ = self.mod_mul_inv
+    elif op == "mod_pow":
+      self._test_ = self.mod_pow
     else:
-      self._test_ = lambda _: False
+      self._test_ = lambda *_: False
 
   def mod_mul_inv(self, a, b, c):
     return b * c % a == 1
+
+  def mod_pow(self, a, b, c, d):
+    return pow(b, c, a) == d
 
   def test(self, argv):
     self._count += 1
@@ -30,7 +35,7 @@ class tester():
     print()
 
 
-_ops = ["mod_mul_inv"]
+_ops = ["mod_mul_inv", "mod_pow"]
 _testers = {op : tester(op) for op in _ops}
 
 for line in sys.stdin.readlines():
