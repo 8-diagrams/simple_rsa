@@ -273,7 +273,7 @@ BigUint& BigUint::operator/=(const BigUint& b) {
       _u.u32.l = _data[i + n - 1];
       uint32_t q = _u.u64 / b._data.back();
       BigUint bb = b * q;
-      bb._data.push_back(0);
+      bb._data.push_back(0); // FIXME: not always need push_back, may be wrong
       while (q > 0 && _compare_uint32_(bb._data.data(), _data.data() + i, bb._data.size()) > 0) {
         --q;
         bb = b * q;
@@ -298,7 +298,7 @@ BigUint& BigUint::operator%=(const BigUint& b) {
   if (*this == b) {
     // *this = 0
     _set_uint32_(0);
-  } else if (*this > b) {
+  } else if (*this > b) { // TODO: need be optimized
     auto q = *this / b;
     auto r = *this - b * q;
     *this = std::move(r);

@@ -72,6 +72,7 @@ public:
 
   // modular multiplicative inverse, n^(-1) mod(*this)
   BigUint mod_mul_inv(uint32_t n) const;
+
   // modular exponentiation, b^e mod(*this)
   BigUint mod_pow(const BigUint& b, const BigUint& e) const;
 
@@ -79,10 +80,13 @@ private:
   void _set_uint32_(uint32_t n);
   int _compare_uint32_(const uint32_t *a, const uint32_t *b, int n) const;
   int _compare_(const BigUint& b) const;
+
   // left shift 32 * n bits
   void _left_shift32_(uint s);
+
   // right shift 32 * n bits
   void _right_shift32_(uint s);
+
   // calculate q = *this / n; r = *this % n;
   void _div_and_mod_(uint32_t n, BigUint& q, uint32_t& r) const;
 
