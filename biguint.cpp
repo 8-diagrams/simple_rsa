@@ -77,6 +77,22 @@ void BigUint::_left_shift32_(uint s) {
   }
 }
 
+void BigUint::_div_and_mod_(uint32_t n, BigUint& q, uint32_t& r) const {
+  assert(n > 0);
+  q = *this;
+  union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
+  _u.u64 = 0;
+  for(int i = q._data.size() - 1; i >= 0; --i) {
+    _u.u32.l = q._data[i];
+    q._data[i] = _u.u64 / n;
+    _u.u32.h = _u.u64 % n;
+  }
+  r = _u.u32.h;
+  if (q._data.size() > 1 && q._data.back() == 0) {
+    q._data.pop_back();
+  }
+}
+
 void BigUint::_div_and_mod_(const BigUint& b, BigUint& q, BigUint& r) const {
   assert(*this > b);
   r = *this;
@@ -88,7 +104,7 @@ void BigUint::_div_and_mod_(const BigUint& b, BigUint& q, BigUint& r) const {
     _u.u32.h = r._data[i + n];
     _u.u32.l = r._data[i + n - 1];
     uint32_t t = _u.u64 / b._data.back();
-    BigUint bb = b * t;
+    BigUint bb{b * t};
     while (_compare_uint32_(bb._data.data(), r._data.data() + i, bb._data.size()) > 0) {
       --t;
       bb = b * t;
@@ -97,7 +113,7 @@ void BigUint::_div_and_mod_(const BigUint& b, BigUint& q, BigUint& r) const {
     bb._left_shift32_(i);
     r -= bb;
   }
-  if (q._data.back() == 0 && q._data.size() > 1) {
+  if (q._data.size() > 1 && q._data.back() == 0) {
     q._data.pop_back();
   }
 }
@@ -130,7 +146,7 @@ BigUint& BigUint::operator-=(uint32_t n) {
       break;
     }
   }
-  if (_data.size() > 1 && *_data.end() == 0) {
+  if (_data.size() > 1 && _data.back() == 0) {
     _data.pop_back();
   }
   return *this;
@@ -158,7 +174,7 @@ BigUint& BigUint::operator/=(uint32_t n) {
     _data[i] = _u.u64 / n;
     _u.u32.h = _u.u64 % n;
   }
-  if (_data.size() > 1 && *_data.end() == 0) {
+  if (_data.size() > 1 && _data.back() == 0) {
     _data.pop_back();
   }
   return *this;
@@ -250,6 +266,47 @@ BigUint& BigUint::operator%=(const BigUint& b) {
     *this = std::move(r);
   }
   return *this;
+}
+
+BigUint BigUint::mod_mul_inv(uint32_t n) const {
+  uint32_t r0 = n, r1;
+  BigUint t0{1}, t1;
+
+  _div_and_mod_(n, t1, r1);
+
+  bool neg_0 = false;
+  bool neg_1 = true;
+
+  while (r1 != 0) {
+    uint32_t q1 = r0 / r1;
+    uint32_t r2 = r0 % r1;
+    r0 = r1;
+    r1 = r2;
+    BigUint t2 = t1 * q1;
+    bool neg_2 = false;
+    if (neg_0 != neg_1) {
+      t2 += t0;
+      neg_2 = neg_0;
+    } else {
+      if (t2 >= t0) {
+        t2 -= t0;
+        neg_2 = neg_1;
+      } else {
+        t2 = t0 - t1;
+        neg_2 = neg_0;
+      }
+    }
+    t0 = std::move(t1);
+    t1 = std::move(t2);
+    neg_0 = neg_1;
+    neg_1 = neg_2;
+  }
+  if (r0 != 1) {
+    t0._set_uint32_(0);
+  } else if (neg_0) {
+    t0 = *this - t0;
+  }
+  return t0;
 }
 
 } // namespace simple_rsa
