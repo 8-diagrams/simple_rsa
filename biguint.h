@@ -42,6 +42,12 @@ public:
   // not exactly, multiple of 32
   void random_bits(uint bits);
 
+  bool operator<(uint32_t n) const { return _data.size() == 1 && _data[0] < n; }
+  bool operator>(uint32_t n) const { return _data.size() > 1 || _data[0] > n; }
+  bool operator==(uint32_t n) const { return _data.size() == 1 && _data[0] == n; }
+  bool operator<=(uint32_t n) const { return _data.size() == 1 && _data[0] <= n; }
+  bool operator>=(uint32_t n) const { return _data.size() > 1 || _data[0] >= n; }
+
   bool operator<(const BigUint& b) const { return _compare_(b) < 0; }
   bool operator>(const BigUint& b) const { return _compare_(b) > 0; }
   bool operator==(const BigUint& b) const { return _compare_(b) == 0; }

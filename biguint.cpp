@@ -88,7 +88,7 @@ void BigUint::_div_and_mod_(uint32_t n, BigUint& q, uint32_t& r) const {
     _u.u32.h = _u.u64 % n;
   }
   r = _u.u32.h;
-  if (q._data.size() > 1 && q._data.back() == 0) {
+  if (q._data.back() == 0 && q._data.size() > 1) {
     q._data.pop_back();
   }
 }
@@ -113,7 +113,7 @@ void BigUint::_div_and_mod_(const BigUint& b, BigUint& q, BigUint& r) const {
     bb._left_shift32_(i);
     r -= bb;
   }
-  if (q._data.size() > 1 && q._data.back() == 0) {
+  if (q._data.back() == 0 && q._data.size() > 1) {
     q._data.pop_back();
   }
 }
@@ -146,7 +146,7 @@ BigUint& BigUint::operator-=(uint32_t n) {
       break;
     }
   }
-  if (_data.size() > 1 && _data.back() == 0) {
+  if (_data.back() == 0 && _data.size() > 1) {
     _data.pop_back();
   }
   return *this;
@@ -174,7 +174,7 @@ BigUint& BigUint::operator/=(uint32_t n) {
     _data[i] = _u.u64 / n;
     _u.u32.h = _u.u64 % n;
   }
-  if (_data.size() > 1 && _data.back() == 0) {
+  if (_data.back() == 0 && _data.size() > 1) {
     _data.pop_back();
   }
   return *this;
