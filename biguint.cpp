@@ -264,21 +264,24 @@ BigUint& BigUint::operator/=(const BigUint& b) {
     // *this = 0
     _set_uint32_(0);
   } else {
-    uint m = _data.size(), n = b._data.size();
+    const uint m = _data.size(), n = b._data.size();
     std::vector<uint32_t> c(m - n + 1);
     _data.push_back(0);
     for (int i = m - n; i >= 0; --i) {
       union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
       _u.u32.h = _data[i + n];
       _u.u32.l = _data[i + n - 1];
-      uint32_t q = _u.u64 / b._data.back();
-      BigUint bb = b * q;
-      bb._data.push_back(0); // FIXME: not always need push_back, may be wrong
-      while (q > 0 && _compare_uint32_(bb._data.data(), _data.data() + i, bb._data.size()) > 0) {
+      int64_t q = _u.u64 / b._data.back();
+      ++q;
+      BigUint bb;
+      do {
         --q;
-        bb = b * q;
-      }
-      if (bb._data.back() == 0 && bb._data.size() > 1) {
+        bb = b * (uint32_t)q;
+        if (bb._data.size() != n + 1) {
+          bb._data.resize(n + 1);
+        }
+      } while (q >= 0 && _compare_uint32_(bb._data.data(), _data.data() + i, bb._data.size()) > 0);
+      while (bb._data.back() == 0 && bb._data.size() > 1) {
         bb._data.pop_back();
       }
       c[i] = q;
