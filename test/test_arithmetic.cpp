@@ -29,14 +29,20 @@ void test(const BigUint& a, const BigUint& b) {
 int main() {
   BigUint a, b;
   std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
-  for (int i = 0 ; i < 10000; ++i) {
+  for (int i = 0 ; i < 1000; ++i) {
     a.random_bits((generator() % 1024) + 1);
     b.random_bits((generator() % 1024) + 1);
     uint32_t n = generator();
     test(a, n);
     test(a, b);
+    n = ((generator() % 1024) + 1);
+    a = 1;
+    auto c = a.mul_exp2(n);
+    auto d = a.mul_exp2(n / 32 * 32);
+    b.random_bits((generator() % 1024) + 1);
+    test(c, a);
+    test(c, b);
+    b = d;
+    test(b, d);
   }
-  a.random_bits((generator() % 1024) + 1);
-  b = a;
-  test(a, b);
 }

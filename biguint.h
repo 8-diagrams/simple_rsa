@@ -70,6 +70,9 @@ public:
   BigUint& operator/=(const BigUint& b);
   BigUint& operator%=(const BigUint& b);
 
+  // return *this * << n
+  BigUint mul_exp2(uint32_t n) const { BigUint b{*this}; b._mul_exp2_(n); return b;}
+
   // modular multiplicative inverse, n^(-1) mod(*this)
   BigUint mod_mul_inv(uint32_t n) const;
 
@@ -80,6 +83,9 @@ private:
   void _set_uint32_(uint32_t n);
   int _compare_uint32_(const uint32_t *a, const uint32_t *b, int n) const;
   int _compare_(const BigUint& b) const;
+
+  // *this << n
+  void _mul_exp2_(uint32_t n);
 
   // left shift 32 * n bits
   void _left_shift32_(uint s);

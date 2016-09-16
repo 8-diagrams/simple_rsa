@@ -25,7 +25,7 @@ int main() {
   BigUint a;
   BigUint b;
   std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
-  for (int i = 0 ; i < 10000; ++i) {
+  for (int i = 0 ; i < 1000; ++i) {
     a.random_bits((generator() % 1024) + 1);
     b.random_bits((generator() % 1024) + 1);
     if (a.is_even()) {

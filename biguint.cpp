@@ -63,6 +63,33 @@ int BigUint::_compare_(const BigUint& b) const {
   }
 }
 
+void BigUint::_mul_exp2_(uint32_t n) {
+  if (*this == 0 || n == 0) {
+    return;
+  }
+  const uint x = n / 32, y = n % 32;
+  if (y == 0) {
+    _left_shift32_(x);
+  } else {
+    const uint32_t low = (1u << (32 - y)) - 1;
+    const uint32_t high = ~low;
+    const int old_size = _data.size();
+    _data.resize(old_size + x + 1);
+    for (int i = old_size - 1; i >= 0; --i) {
+      _data[i + x + 1] = (_data[i + 1] &  low) << y;
+      _data[i + x + 1] |= (_data[i] & high) >> (32 - y);
+    }
+    _data[x] = (_data[0] &  low) << y;
+    for (int i = x - 1; i >= 0; --i) {
+      _data[i] = 0;
+    }
+    if (_data.back() == 0 && _data.size() > 1) {
+      _data.pop_back();
+    }
+    assert (_data.back() != 0 || _data.size() == 1);
+  }
+}
+
 void BigUint::_left_shift32_(uint s) {
   if (*this == 0 || s == 0) {
     return;
@@ -288,7 +315,7 @@ BigUint& BigUint::operator/=(const BigUint& b) {
       bb._left_shift32_(i);
       *this -= bb;
     }
-    if (c.back() == 0 && c.size() > 1) {
+    while (c.back() == 0 && c.size() > 1) {
       c.pop_back();
     }
     assert (c.back() != 0 || c.size() == 1);
@@ -308,6 +335,7 @@ BigUint& BigUint::operator%=(const BigUint& b) {
   }
   return *this;
 }
+
 
 BigUint BigUint::mod_mul_inv(uint32_t n) const {
   uint32_t r0 = n, r1;
