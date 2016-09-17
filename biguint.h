@@ -45,6 +45,13 @@ public:
   bool is_odd() const { return (_data[0] & 0x1) != 0; }
   bool is_even() const { return (_data[0] & 0x1) == 0; }
 
+  // most significant uint32
+  uint32_t msu() const { return _data.back(); }
+  uint32_t& msu() { return _data.back(); }
+  // least significant uint32
+  uint32_t lsu() const { return _data.front(); }
+  uint32_t& lsu() { return _data.front(); }
+
   bool operator<(uint32_t n) const { return _data.size() == 1 && _data[0] < n; }
   bool operator>(uint32_t n) const { return _data.size() > 1 || _data[0] > n; }
   bool operator==(uint32_t n) const { return _data.size() == 1 && _data[0] == n; }
@@ -104,6 +111,34 @@ private:
 private:
   std::vector<uint32_t> _data;
 };
+
+
+inline BigUint operator+(const BigUint& b, uint32_t n) {
+  BigUint c(b);
+  return c += n;
+}
+
+inline BigUint operator-(const BigUint& b, uint32_t n) {
+  BigUint c(b);
+  return c -= n;
+}
+
+inline BigUint operator*(const BigUint& b, uint32_t n) {
+  BigUint c(b);
+  return c *= n;
+}
+
+inline BigUint operator/(const BigUint& b, uint32_t n) {
+  BigUint c(b);
+  return c /= n;
+}
+
+inline uint32_t operator%(const BigUint& b, uint32_t n) {
+  BigUint c(b);
+  c %= n;
+  return c.lsu();
+}
+
 
 inline BigUint operator+(const BigUint& b1, const BigUint& b2) {
   BigUint c(b1);
