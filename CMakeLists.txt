@@ -5,7 +5,9 @@ find_package(Boost COMPONENTS program_options REQUIRED)
 add_compile_options(-std=c++11 -Wall -Wextra)
 include_directories(${PROJECT_SOURCE_DIR})
 
-add_library(mybiguint STATIC biguint.cpp)
+add_library(mybiguint STATIC biguint.cpp
+                             prime.cpp
+                             prime_numbers.cpp)
 
 add_library(mysra STATIC rsa.cpp)
 target_link_libraries(mysra mybiguint)
