@@ -190,9 +190,9 @@ BigUint& BigUint::operator-=(uint32_t n) {
 
 BigUint& BigUint::operator*=(uint32_t n) {
   union { struct {uint32_t l, h;} u32; uint64_t u64;} _u;
-  _u.u32 = {0, n};
+  _u.u32.h = 0;
   for (uint i = 0; i < _data.size(); ++i) {
-    _u.u64 = (uint64_t)_data[i] * (int32_t)_u.u32.h;
+    _u.u64 = (uint64_t)_data[i] * n + _u.u32.h;
     _data[i] = _u.u32.l;
   }
   if (_u.u32.h > 0) {
@@ -220,7 +220,7 @@ BigUint& BigUint::operator/=(uint32_t n) {
 BigUint& BigUint::operator%=(uint32_t n) {
   uint32_t k = UINT32_MAX % n + 1;
   uint32_t r = 0;
-  for (int i = (int)_data.size(); i >= 0; ++i) {
+  for (int i = _data.size() - 1; i >= 0; --i) {
     r = ((uint64_t)r * k + _data[i]) % n;
   }
   _data.resize(1);
