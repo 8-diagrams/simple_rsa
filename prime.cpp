@@ -1,5 +1,5 @@
 #include <vector>
-#include "prime.h"
+#include "biguint.h"
 
 namespace simple_rsa {
 

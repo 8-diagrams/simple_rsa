@@ -3,7 +3,7 @@
 import sys
 
 def generate_file(primes):
-  print('#include "prime.h"')
+  print('#include "biguint.h"')
   print()
   print("namespace simple_rsa {")
   print()

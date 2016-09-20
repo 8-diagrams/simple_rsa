@@ -165,6 +165,15 @@ inline BigUint operator%(const BigUint& b1, const BigUint& b2) {
   return c %= b2;
 }
 
+
+extern const uint32_t PRIME_NUMBERS[];
+extern const int PRIME_NUMBERS_SIZE;
+
+// make b and all PRIME_NUMBERS are relatively prime
+void primer_numbers_test(BigUint& b);
+
+bool miller_rabin_test(const BigUint& b);
+
 } // namespace simple_rsa
 
 #endif // _BIGUINT_H__
