@@ -37,8 +37,8 @@ int main() {
     test(a, b);
     n = ((generator() % 1024) + 1);
     a = 1;
-    auto c = a.mul_exp2(n);
-    auto d = a.mul_exp2(n / 32 * 32);
+    auto c = a.left_shift(n);
+    auto d = a.left_shift(n / 32 * 32);
     b.random_bits((generator() % 1024) + 1);
     test(c, a);
     test(c, b);

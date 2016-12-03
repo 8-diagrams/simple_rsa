@@ -63,7 +63,7 @@ int BigUint::_compare_(const BigUint& b) const {
   }
 }
 
-void BigUint::_mul_exp2_(uint32_t n) {
+void BigUint::_left_shift_(uint32_t n) {
   if (*this == 0 || n == 0) {
     return;
   }
