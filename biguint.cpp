@@ -21,19 +21,37 @@ void BigUint::shrink_to_fit() {
   _data.shrink_to_fit();
 }
 
-void BigUint::random_bits(uint bits) {
+void BigUint::random_bits(int bits) {
   assert(bits > 0);
-  uint n = (bits + 31) >> 5;
-  _data.resize(n);
+  int n = bits / 32;
+  int m = bits % 32;
+  if (m == 0) {
+    --n;
+    m = 31;
+  }
+  _data.resize(n + 1);
   std::mt19937 generator(std::chrono::system_clock::now().time_since_epoch().count());
-  for (uint i = 0; i < n; ++i) {
+  for (int i = 0; i <= n; ++i) {
     _data[i] = generator();
   }
-  // make sure the most significant uint32_t > 0
-  while (_data[n - 1] == 0) {
-    _data[n - 1] = generator();
-  }
+  _data[n] &= (1u << m) - 1;
+  _data[n] |= 1u << m;
 }
+
+int BigUint::bits() const {
+  int bs = _data.size() * 32;
+  auto top = _data.back();
+  int p = 31;
+  while (p >= 0) {
+    p = 31;
+    uint32_t k = 1u << p;
+    if ((k & top) != 0) {
+      break;
+    }
+  }
+  return bs + p + 1;
+}
+
 
 void BigUint::_set_uint32_(uint32_t n) {
   _data.resize(1);
@@ -104,6 +122,35 @@ void BigUint::_left_shift32_(uint s) {
   }
 }
 
+
+void BigUint::_right_shift_(uint32_t n) {
+  if (*this == 0 || n == 0) {
+    return;
+  }
+  if (n >= (uint32_t)bits()) {
+    *this = 0;
+    return;
+  }
+  const uint x = n / 32, y = n % 32;
+  if (y == 0) {
+    _right_shift32_(x);
+  } else {
+    const uint32_t low = UINT32_MAX >> (32 - y);
+    const int old_size = _data.size();
+    size_t new_size = old_size - x;
+    _data.resize(new_size);
+    for (uint i = 0; i < new_size - 1; ++i) {
+      _data[i] = _data[i] >> y;
+      _data[i] |= (_data[i + 1] & low) << (32 - y);
+    }
+    _data[new_size - 1] = _data[new_size - 1] >> y;
+    if (_data.back() == 0 && _data.size() > 1) {
+      _data.pop_back();
+    }
+    assert (_data.back() != 0 || _data.size() == 1);
+  }
+}
+
 void BigUint::_right_shift32_(uint s) {
   if (*this == 0 || s == 0) {
     return;
@@ -119,6 +166,7 @@ void BigUint::_right_shift32_(uint s) {
     _data.resize(new_size);
   }
 }
+
 
 void BigUint::_div_and_mod_(uint32_t n, BigUint& q, uint32_t& r) const {
   assert(n > 0);

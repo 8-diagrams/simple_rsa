@@ -39,8 +39,8 @@ public:
   // not exactly, multiple of 32
   void shrink_to_fit();
 
-  // not exactly, multiple of 32
-  void random_bits(uint bits);
+  void random_bits(int bits);
+  int bits() const;
 
   bool is_odd() const { return (_data[0] & 0x1) != 0; }
   bool is_even() const { return (_data[0] & 0x1) == 0; }
@@ -77,8 +77,13 @@ public:
   BigUint& operator/=(const BigUint& b);
   BigUint& operator%=(const BigUint& b);
 
-  // return *this * << n
+  // return *this << n
+  BigUint& left_shift(uint32_t n) { this->_left_shift_(n); return *this;}
   BigUint left_shift(uint32_t n) const { BigUint b{*this}; b._left_shift_(n); return b;}
+
+  // return *this >> n
+  BigUint& right_shift(uint32_t n) { this->_right_shift32_(n); return *this;}
+  BigUint right_shift(uint32_t n) const { BigUint b{*this}; b._right_shift_(n); return b;}
 
   // modular multiplicative inverse, n^(-1) mod(*this)
   BigUint mod_mul_inv(uint32_t n) const;
@@ -96,6 +101,9 @@ private:
 
   // left shift 32 * n bits
   void _left_shift32_(uint s);
+
+  // *this >> n
+  void _right_shift_(uint s);
 
   // right shift 32 * n bits
   void _right_shift32_(uint s);
